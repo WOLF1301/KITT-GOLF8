@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KITT Dashboard - Golf 8 Hands-Free</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .panoramic-display {
+            width: 95vw;
+            max-width: 1200px;
+            background: #050505;
+            padding: 30px;
+            border: 2px solid #1a1a1a;
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 1), inset 0 0 20px rgba(255, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .header-text {
+            text-align: center;
+            font-weight: 700;
+            font-size: 32px;
+            letter-spacing: 15px;
+            margin-bottom: 25px;
+            color: #ff0000;
+            text-shadow: 0 0 15px #f00, 0 0 5px #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px auto 280px;
+            gap: 120px;
+            justify-content: center;
+        }
+
+        .btn-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn-kitt {
+            height: 65px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            letter-spacing: 2px;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+
+        .btn-active-led {
+            box-shadow: 0 0 25px #fff, inset 0 0 12px #fff;
+            transform: scale(0.96);
+        }
+
+        .btn-yellow {
+            background: linear-gradient(180deg, #eab308, #a16207);
+            color: #000;
+        }
+
+        .btn-red {
+            background: linear-gradient(180deg, #dc2626, #7f1d1d);
+            color: #fff;
+        }
+
+        .btn-green {
+            background: linear-gradient(180deg, #16a34a, #064e3b);
+            color: #fff;
+        }
+
+        .voice-box {
+            display: flex;
+            gap: 15px;
+            padding: 30px;
+            border: 2px solid #333;
+        }
+
+        .led-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .led-segment {
+            width: 60px;
+            height: 14px;
+            background: #200;
+        }
+
+        .led-segment.active {
+            background: red;
+            box-shadow: 0 0 10px red;
+        }
+
+        #status-bar {
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body onclick="initKITT()">
+<div class="crt-overlay"></div>
+
+<div class="panoramic-display">
+    <div class="header-text" onclick="playKittSound(event)">K.I.T.T.</div>
+
+    <div class="main-layout">
+        <div class="btn-column">
+            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">CONFOR</div>
+            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">APPEL</div>
+            <div class="btn-kitt btn-red" onclick="pressBtn(this)">TURBO</div>
+        </div>
+
+        <div class="voice-box">
+            <div class="led-column" id="col-0"></div>
+            <div class="led-column" id="col-1"></div>
+            <div class="led-column" id="col-2"></div>
+        </div>
+
+        <div class="btn-column">
+            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">MICRO</div>
+            <div class="btn-kitt btn-red" onclick="pressBtn(this)">SCANNER</div>
+            <div class="btn-kitt btn-green" onclick="pressBtn(this)">SÉCURITÉ</div>
+        </div>
+    </div>
+
+    <div id="status-bar">Système prêt</div>
+</div>
+
+<script>
+    const segmentsCount = 13;
+    const columns = [
+        document.getElementById("col-0"),
+        document.getElementById("col-1"),
+        document.getElementById("col-2")
+    ];
+
+    columns.forEach(col => {
+        for (let i = 0; i < segmentsCount; i++) {
+            const d = document.createElement("div");
+            d.className = "led-segment";
+            col.appendChild(d);
+        }
+    });
+
+    let speaking = false;
+
+    setInterval(() => {
+        columns.forEach(col => {
+            const segs = col.children;
+            const level = speaking ? Math.floor(Math.random() * segmentsCount) : 0;
+            [...segs].forEach((s, i) => {
+                s.classList.toggle("active", i < level);
+            });
+        });
+    }, 70);
+
+    function initKITT() {
+        speaking = true;
+        setTimeout(() => speaking = false, 2000);
+    }
+
+    function playKittSound(e) {
+        e.stopPropagation();
+        speaking = true;
+        setTimeout(() => speaking = false, 2000);
+    }
+
+    function pressBtn(el) {
+        el.classList.add("btn-active-led");
+        setTimeout(() => el.classList.remove("btn-active-led"), 500);
+    }
+</script>
+</body>
+</html>

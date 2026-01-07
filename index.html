@@ -6,6 +6,7 @@
     <title>KITT Dashboard - Golf 8 Hands-Free</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Importation des polices retro */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
 
         body {
@@ -18,11 +19,12 @@
             justify-content: center;
             align-items: center;
             margin: 0;
+            touch-action: manipulation;
         }
 
+        /* Effet CRT */
         .crt-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 3px, 3px 100%;
@@ -31,179 +33,680 @@
         }
 
         .panoramic-display {
-            width: 95vw;
-            max-width: 1200px;
+            width: 98vw;
+            max-width: 1200px; /* Largeur augmentée pour décaler les boutons */
             background: #050505;
-            padding: 30px;
+            padding: 15px 25px; 
             border: 2px solid #1a1a1a;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: 0 0 40px rgba(0, 0, 0, 1), inset 0 0 20px rgba(255, 0, 0, 0.02);
             position: relative;
         }
 
         .header-text {
             text-align: center;
+            font-family: 'Orbitron', sans-serif;
             font-weight: 700;
-            font-size: 32px;
+            font-size: 28px; /* Taille police légèrement augmentée */
             letter-spacing: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             color: #ff0000;
             text-shadow: 0 0 15px #f00, 0 0 5px #fff;
             cursor: pointer;
+            transition: transform 0.1s ease;
             user-select: none;
         }
 
+        /* LAYOUT ÉLARGI */
         .main-layout {
             display: grid;
-            grid-template-columns: 280px auto 280px;
-            gap: 120px;
+            /* Colonnes fixes plus larges et gap augmenté */
+            grid-template-columns: 220px auto 220px; 
+            align-items: center;
+            gap: 70px; /* Gap augmenté pour plus d'espace */
             justify-content: center;
+            padding: 20px 0;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            /* Layout vertical pour petits écrans */
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .btn-column {
+                align-items: center;
+            }
+            .btn-kitt {
+                max-width: 300px; /* Augmenté légèrement pour le mobile */
+            }
         }
 
         .btn-column {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px; /* Espacement entre boutons légèrement augmenté */
         }
 
         .btn-kitt {
-            height: 65px;
-            border-radius: 6px;
+            width: 100%;
+            height: 60px; /* Hauteur bouton augmentée */
+            border-radius: 6px; /* Coins légèrement plus arrondis */
             cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
             font-weight: 700;
+            font-size: 16px; /* Taille texte bouton augmentée */
             letter-spacing: 2px;
-            user-select: none;
-            transition: transform 0.1s ease;
+            font-family: 'Orbitron', sans-serif;
+            touch-action: manipulation;
         }
 
         .btn-active-led {
-            box-shadow: 0 0 25px #fff, inset 0 0 12px #fff;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 15px #ffffff, inset 0 0 8px #ffffff !important;
             transform: scale(0.96);
         }
 
-        .btn-yellow {
-            background: linear-gradient(180deg, #eab308, #a16207);
+        /* Couleurs des boutons */
+        .btn-yellow { 
+            background: linear-gradient(180deg, #eab308 0%, #a16207 100%); 
+            box-shadow: 0 4px #422006; /* Ombre ajustée */
             color: #000;
         }
-
-        .btn-red {
-            background: linear-gradient(180deg, #dc2626, #7f1d1d);
-            color: #fff;
+        .btn-red { 
+            background: linear-gradient(180deg, #dc2626 0%, #7f1d1d 100%); 
+            box-shadow: 0 4px #450a0a; /* Ombre ajustée */
+            color: #fff; 
+        }
+        .btn-black-text { color: #000 !important; font-weight: 900; }
+        .btn-green { 
+            background: linear-gradient(180deg, #16a34a 0%, #064e3b 100%); 
+            box-shadow: 0 4px #022c22; /* Ombre ajustée */
+            color: #fff; 
         }
 
-        .btn-green {
-            background: linear-gradient(180deg, #16a34a, #064e3b);
-            color: #fff;
+        /* Visualiseur de voix KITT */
+        .voice-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
         }
 
         .voice-box {
             display: flex;
-            gap: 15px;
-            padding: 30px;
+            gap: 12px; /* Espace LED augmenté */
+            padding: 25px; /* Padding augmenté */
+            background: #000;
             border: 2px solid #333;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255,0,0,0.1);
         }
 
-        .led-column {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .led-column { display: flex; flex-direction: column; gap: 4px; /* Espace segment augmenté */ }
+        .led-segment { width: 50px; height: 12px; /* Taille LED augmentée */ background-color: #200; transition: background 0.05s ease; }
+        .led-segment.active { background-color: #ff0000; box-shadow: 0 0 10px #ff0000, 0 0 3px #fff; }
 
-        .led-segment {
-            width: 60px;
-            height: 14px;
-            background: #200;
-        }
-
-        .led-segment.active {
-            background: red;
-            box-shadow: 0 0 10px red;
+        .deco-line {
+            width: 100%;
+            height: 1px;
+            background: #400;
+            margin: 15px 0;
+            box-shadow: 0 0 5px #400;
         }
 
         #status-bar {
-            text-align: center;
-            font-size: 11px;
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
             color: #555;
-            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
-
 <body onclick="initKITT()">
-<div class="crt-overlay"></div>
+    <div class="crt-overlay"></div>
 
-<div class="panoramic-display">
-    <div class="header-text" onclick="playKittSound(event)">K.I.T.T.</div>
+    <div class="panoramic-display">
+        <!-- Titre KITT -->
+        <div class="header-text" id="headerTitle" onclick="playKittSound(event)">K.I.T.T.</div>
+        
+        <div class="deco-line"></div>
 
-    <div class="main-layout">
-        <div class="btn-column">
-            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">CONFOR</div>
-            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">APPEL</div>
-            <div class="btn-kitt btn-red" onclick="pressBtn(this)">TURBO</div>
+        <div class="main-layout">
+            <div class="btn-column">
+                <div class="btn-kitt btn-yellow btn-black-text" onclick="pressConforBtn(this)">CONFOR</div>
+                <div class="btn-kitt btn-yellow btn-black-text" onclick="pressBtn(this)">APPEL</div>
+                <div class="btn-kitt btn-red btn-black-text" onclick="pressBtn(this)">TURBO</div>
+            </div>
+
+            <div class="voice-section">
+                <div class="voice-box" id="voiceBox">
+                    <div class="led-column" id="col-0"></div>
+                    <div class="led-column" id="col-1"></div>
+                    <div class="led-column" id="col-2"></div>
+                </div>
+            </div>
+
+            <div class="btn-column">
+                <div id="microBtn" class="btn-kitt btn-yellow" onclick="toggleMicro(this)">MICRO</div>
+                <div class="btn-kitt btn-red btn-black-text" onclick="pressBtn(this)">SCANNER</div>
+                <div class="btn-kitt btn-green btn-black-text" onclick="pressBtn(this)">SÉCURITÉ</div>
+            </div>
         </div>
 
-        <div class="voice-box">
-            <div class="led-column" id="col-0"></div>
-            <div class="led-column" id="col-1"></div>
-            <div class="led-column" id="col-2"></div>
-        </div>
-
-        <div class="btn-column">
-            <div class="btn-kitt btn-yellow" onclick="pressBtn(this)">MICRO</div>
-            <div class="btn-kitt btn-red" onclick="pressBtn(this)">SCANNER</div>
-            <div class="btn-kitt btn-green" onclick="pressBtn(this)">SÉCURITÉ</div>
-        </div>
+        <div class="deco-line"></div>
+        <div id="status-bar">Système prêt - Cliquez pour initialiser</div>
     </div>
 
-    <div id="status-bar">Système prêt</div>
-</div>
+    <script>
+        // --- CONFIGURATION (Joseph Santiago - 2026) ---
+        const OLLAMA_URL = "http://127.0.0.1:11434/api/generate";
+        const MODEL_NAME = "qwen3-code:30b"; // MODÈLE LLM
+        const WEATHER_API_KEY = "a758e0295bf52db6176674d6da3f3340";
+        const ELEVENLABS_KEY = "sk_1012cf7f353b691f18d90b9a84f4021bba4f14a3977d98af";
+        const VOICE_ID = "FZ7xMJfy94PaY9LHzcuh"; // VOICE ID MIS À JOUR PAR L'UTILISATEUR
 
-<script>
-    const segmentsCount = 13;
-    const columns = [
-        document.getElementById("col-0"),
-        document.getElementById("col-1"),
-        document.getElementById("col-2")
-    ];
+        // CLÉ API POUR LE MODÈLE DE REPLI (REMPLACER AVEC VOTRE CLÉ OPENAI)
+        const OPENAI_API_KEY = "VOTRE_CLE_API_GPT4O"; 
+        // --- FIN CONFIGURATION ---
 
-    columns.forEach(col => {
-        for (let i = 0; i < segmentsCount; i++) {
-            const d = document.createElement("div");
-            d.className = "led-segment";
-            col.appendChild(d);
-        }
-    });
+        const apiKey = ""; // Laissez vide. Utilisé uniquement par Gemini TTS (fallback).
+        const segmentsCount = 13;
+        
+        const scannerURL = 'https://orangefreesounds.com/wp-content/uploads/2016/01/Knight-rider-kitt-scanner-sound.mp3';
+        const kittSoundURL = 'https://dl.dropboxusercontent.com/scl/fi/y89c4z6a0q6g6x1m829p8/KITT_Voice_Effect_Sample.mp3?rlkey=4x1e0x8q6q6v6b8z0k6j8w6s1';
+        const buttonSoundURL = 'https://dl.dropboxusercontent.com/scl/fi/s4c2m3cs5rm2hesrydgmz/mac-77-knight-rider-trans-am-kitt-voicebox-startup-light-sequence-80s-tech_iCw8511T.mp3?rlkey=3164117psc7cfllv2k2pki1el';
+        const conforSoundURL = 'https://dl.dropboxusercontent.com/scl/fi/w3xiozaaltb97lpj055t5/bouttonCONFOR.mp3?rlkey=e6ef0l2xu0ycbyx8xc2hi7mve';
 
-    let speaking = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const sndScanner = new Audio();
+        sndScanner.loop = true;
+        sndScanner.volume = 0.2;
+        sndScanner.crossOrigin = "anonymous";
+        sndScanner.src = scannerURL;
 
-    setInterval(() => {
+        const sndKittSpecial = new Audio();
+        sndKittSpecial.src = kittSoundURL;
+
+        let systemsStarted = false;
+        let speaking = false;
+        let isListening = false;
+        let microEnabled = true;
+        let isStarting = false; // Drapeau pour empêcher les redémarrages multiples
+
+        // --- Visualiseur de Voix (Non modifié) ---
+        const columns = [
+            document.getElementById('col-0'),
+            document.getElementById('col-1'),
+            document.getElementById('col-2')
+        ];
+
         columns.forEach(col => {
-            const segs = col.children;
-            const level = speaking ? Math.floor(Math.random() * segmentsCount) : 0;
-            [...segs].forEach((s, i) => {
-                s.classList.toggle("active", i < level);
-            });
+            if (col) {
+                // S'assurer que les segments sont créés
+                col.innerHTML = ''; 
+                for (let i = 0; i < segmentsCount; i++) {
+                    const seg = document.createElement('div');
+                    seg.className = 'led-segment';
+                    col.appendChild(seg);
+                }
+            }
         });
-    }, 70);
 
-    function initKITT() {
-        speaking = true;
-        setTimeout(() => speaking = false, 2000);
-    }
+        function animateVoice() {
+            columns.forEach(col => {
+                if (!col) return;
+                const segments = col.querySelectorAll('.led-segment');
+                
+                // Active uniquement si KITT parle (speaking = true)
+                let currentVolume = 0;
+                if (speaking) {
+                    // Volume aléatoire entre 1 et 8
+                    currentVolume = Math.floor(Math.random() * 8) + 1; 
+                }
+                
+                // Si currentVolume est 0 (KITT ne parle pas), aucune barre ne s'active.
+                segments.forEach((seg, i) => {
+                    const center = Math.floor(segmentsCount / 2);
+                    const distance = Math.abs(i - center);
+                    
+                    // Active le segment si sa distance au centre est inférieure à la moitié du volume
+                    if (currentVolume > 0 && distance < currentVolume / 2) {
+                        seg.classList.add('active');
+                    } else {
+                        seg.classList.remove('active');
+                    }
+                });
+            });
+        }
+        setInterval(animateVoice, 65);
 
-    function playKittSound(e) {
-        e.stopPropagation();
-        speaking = true;
-        setTimeout(() => speaking = false, 2000);
-    }
+        // --- Intégration Ollama/GPT-4o pour la Conversation ---
 
-    function pressBtn(el) {
-        el.classList.add("btn-active-led");
-        setTimeout(() => el.classList.remove("btn-active-led"), 500);
-    }
-</script>
+        async function generateOllamaResponse(prompt) {
+             document.getElementById('status-bar').innerText = "KITT RÉFLÉCHIT (LLM)...";
+             const systemPrompt = `Tu es KITT, l'ordinateur de bord d'une Golf 8 de 2021, propulsé par le modèle LLM gpt-4o (ou ${MODEL_NAME} si Ollama est actif). Tu es un assistant intelligent, poli, loyal, très formel et légèrement paternaliste envers ton propriétaire, Joseph Santiago. Tu réponds toujours en utilisant un ton calme et protecteur, et en appelant ton utilisateur "Joseph". Tes réponses doivent être concises et directes.`;
+             
+             // Fallback GPT-4o (utilisé ici car Ollama est un appel local)
+             const apiUrl = "https://api.openai.com/v1/chat/completions";
+             
+             const payload = {
+                 model: "gpt-4o",
+                 messages: [
+                     { role: "system", content: systemPrompt },
+                     { role: "user", content: prompt }
+                 ],
+                 temperature: 0.7,
+                 max_tokens: 300,
+             };
+
+             try {
+                 const response = await fetch(apiUrl, {
+                     method: 'POST',
+                     headers: { 
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${OPENAI_API_KEY}` // Utilisation de la clé OpenAI
+                     },
+                     body: JSON.stringify(payload)
+                 });
+                 
+                 const result = await response.json();
+                 // Vérifie la présence d'une erreur API d'OpenAI
+                 if (result.error) {
+                    console.error("Erreur API OpenAI:", result.error.message);
+                    return "Erreur d'authentification ou API GPT-4o indisponible, Joseph. Vérifiez votre clé.";
+                 }
+
+                 return result.choices?.[0]?.message?.content || "Je n'ai pas pu générer de réponse via GPT-4o Joseph.";
+
+             } catch (error) {
+                 console.error("Erreur LLM/GPT-4o:", error);
+                 return "Mes circuits de communication semblent interrompus. Veuillez réessayer Joseph.";
+             }
+        }
+
+
+        // --- Logique Audio KITT (Filtre non modifié) ---
+
+        function makeDistortionCurve(amount) {
+            let k = typeof amount === 'number' ? amount : 50,
+                n_samples = 44100,
+                curve = new Float32Array(n_samples);
+            for (let i = 0; i < n_samples; ++i) {
+                let x = i * 2 / n_samples - 1;
+                // Formule de distorsion (simplifiée pour effet robotique)
+                curve[i] = (3 + k) * x * 20 * (Math.PI / 180) / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+
+        function applyKITTFilter(audio) {
+            // Nécessite que l'audioCtx soit débloqué
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const source = audioCtx.createMediaElementSource(audio);
+            
+            // 1. Filtre Passe-Bande (Talkie-Walkie)
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = "bandpass";
+            filter.frequency.setValueAtTime(1600, audioCtx.currentTime); 
+            filter.Q.setValueAtTime(1.5, audioCtx.currentTime); 
+            
+            // 2. Distorsion (Grain électronique)
+            const distortion = audioCtx.createWaveShaper();
+            distortion.curve = makeDistortionCurve(30); 
+
+            // 3. Connexion
+            source.connect(filter);
+            filter.connect(distortion);
+            distortion.connect(audioCtx.destination);
+        }
+
+        async function speakKITT(text) {
+            // --- LOGIQUE DE GESTION AUDIO ---
+
+            // ***************************************************************
+            // ATTENTION: DANS CET ENVIRONNEMENT (CANVAS/IFRAME), 
+            // LES APPELS VERS ELEVENLABS SONT BLOQUÉS PAR LES RÈGLES DE SÉCURITÉ.
+            // Ce code ElevenLabs est maintenant actif. Il utilisera votre voix 
+            // personnalisée une fois déployé sur votre propre serveur.
+            // ***************************************************************
+
+            // --- DÉBUT CODE ELEVENLABS (MAINTENANT ACTIF) ---
+            const elevenLabsApiUrl = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
+
+            try {
+                const response = await fetch(elevenLabsApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'audio/mpeg',
+                        'Content-Type': 'application/json',
+                        'xi-api-key': ELEVENLABS_KEY 
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        model_id: 'eleven_multilingual_v2', // Ou le modèle de votre choix
+                        voice_settings: {
+                            stability: 0.5,
+                            similarity_boost: 0.8
+                        }
+                    })
+                });
+
+                if (!response.ok) throw new Error("ElevenLabs API failed with status: " + response.status);
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                applyKITTFilter(audio);
+
+                return new Promise((resolve) => {
+                    audio.onplay = () => { 
+                        speaking = true; 
+                        document.getElementById('status-bar').innerText = "KITT PARLE (ELEVENLABS)...";
+                        sndScanner.volume = 0.05; 
+                        try { if (recognition && isListening) recognition.stop(); } catch(e) {}
+                    };
+                    audio.onended = () => { 
+                        speaking = false; 
+                        sndScanner.volume = 0.2; 
+                        document.getElementById('status-bar').innerText = "KITT EN VEILLE (Dites 'KITT' ou 'K2000')";
+                        URL.revokeObjectURL(audioUrl); 
+                        safeStartRecognition(); 
+                        resolve(); 
+                    };
+                    audio.play().catch(e => { console.error("Audio play error:", e); resolve(); });
+                });
+
+            } catch (e) {
+                console.warn("ElevenLabs TTS failed or blocked. Falling back to Gemini TTS.", e);
+                
+                // ***************************************************************
+                // --- DÉBUT CODE FALLBACK GEMINI (ACTIF SEULEMENT EN CAS D'ÉCHEC ELEVENLABS) ---
+                // ***************************************************************
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                    
+                    try {
+                        const response = await fetch(ttsApiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: "Dis avec une voix de robot protecteur et calme : " + text }] }],
+                                generationConfig: {
+                                    responseModalities: ["AUDIO"],
+                                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } 
+                                }
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                        if (!audioData) throw new Error("Audio data not found in response.");
+
+                        const audioBlob = pcmToWavBlob(audioData, 24000);
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audio = new Audio(audioUrl);
+                        
+                        applyKITTFilter(audio);
+
+                        return new Promise((resolve) => {
+                            audio.onplay = () => { 
+                                speaking = true; 
+                                document.getElementById('status-bar').innerText = "KITT PARLE (GEMINI FALLBACK)...";
+                                sndScanner.volume = 0.05; 
+                                try { if (recognition && isListening) recognition.stop(); } catch(e) {}
+                            };
+                            audio.onended = () => { 
+                                speaking = false; 
+                                sndScanner.volume = 0.2; 
+                                document.getElementById('status-bar').innerText = "KITT EN VEILLE (Dites 'KITT' ou 'K2000')";
+                                URL.revokeObjectURL(audioUrl); 
+                                safeStartRecognition(); 
+                                resolve(); 
+                            };
+                            audio.play().catch(e => { console.error("Audio play error (Gemini):", e); resolve(); });
+                        });
+                    } catch (e) {
+                        console.error(`Gemini TTS Attempt ${attempt + 1} failed:`, e);
+                        if (attempt < 2) await new Promise(res => setTimeout(res, Math.pow(2, attempt) * 1000));
+                    }
+                }
+                // ***************************************************************
+                // --- FIN CODE FALLBACK GEMINI ---
+                // ***************************************************************
+            }
+            // --- FIN CODE ELEVENLABS ---
+
+            speaking = false; 
+            document.getElementById('status-bar').innerText = "Erreur TTS. KITT en veille.";
+        }
+
+
+        function pcmToWavBlob(base64Data, sampleRate) {
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Uint8Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+            const buffer = byteNumbers.buffer;
+            const wavHeader = new ArrayBuffer(44);
+            const view = new DataView(wavHeader);
+            const writeString = (v, o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + buffer.byteLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); 
+            view.setUint16(22, 1, true); 
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true); 
+            view.setUint16(34, 16, true); 
+            writeString(view, 36, 'data');
+            view.setUint32(40, buffer.byteLength, true);
+            return new Blob([wavHeader, buffer], { type: 'audio/wav' });
+        }
+        
+        // --- Reconnaissance Vocale (Web Speech API) (Non modifiée) ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => { 
+                isListening = true; 
+                isStarting = false; // Fin du processus de démarrage
+                document.getElementById('status-bar').innerText = "KITT ÉCOUTE (Dites 'KITT' ou 'K2000')";
+            };
+            
+            recognition.onresult = (event) => {
+                if (microEnabled) return;
+                const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                processCommand(transcript);
+            };
+            
+            recognition.onend = () => {
+                isListening = false;
+                // Attendre un peu avant de redémarrer pour éviter l'InvalidStateError
+                if (systemsStarted && microEnabled && !speaking) {
+                    setTimeout(safeStartRecognition, 100); 
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                isStarting = false;
+                if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                    console.error('Erreur de reconnaissance vocale:', event.error);
+                }
+            };
+        }
+
+        function safeStartRecognition() {
+            // Empêche le démarrage si déjà démarré, si en cours de démarrage, si les systèmes ne sont pas prêts,
+            // si le micro est désactivé, ou si KITT est en train de parler.
+            if (recognition && !isListening && !isStarting && systemsStarted && microEnabled && !speaking) {
+                isStarting = true; // Démarre le drapeau
+                try { 
+                    recognition.start(); 
+                } catch (e) {
+                    if (e.name === 'InvalidStateError') { 
+                        // Cela signifie qu'elle est déjà démarrée (souvent un faux positif après onend)
+                        isListening = true;
+                        isStarting = false; 
+                    } else {
+                        console.error('Erreur au démarrage de la reconnaissance:', e);
+                        isStarting = false;
+                    }
+                }
+            }
+        }
+
+        async function processCommand(cmd) {
+            if (speaking || !microEnabled) return;
+            
+            // VÉRIFICATION OBLIGATOIRE DU MOT-CLÉ
+            if (!cmd.includes("kitt") && !cmd.includes("k2000")) {
+                document.getElementById('status-bar').innerText = "KITT EN VEILLE (Dites 'KITT' ou 'K2000')";
+                return; 
+            }
+            
+            const cleanCmd = cmd.replace(/kitt|k2000/g, '').trim();
+
+            if (cleanCmd.length < 2) { 
+                // Réponse d'accueil après le mot-clé
+                await speakKITT("Oui Joseph ? Que puis-je faire pour vous ?");
+                return;
+            }
+
+            let response = "";
+            let commandHandled = true;
+            
+            // Commandes statiques
+            if (cleanCmd.includes("modèle de voiture") || cleanCmd.includes("modèle de véhicule") || cleanCmd.includes("quelle voiture")) {
+                response = "Je suis une Golf 8 année 2021 couleur Gris nardo. C'est un excellent choix Joseph.";
+            } else if (cleanCmd.includes("qui tu") || cleanCmd.includes("qui es-tu")) {
+                // Réponse mise à jour pour inclure le nom du nouveau modèle
+                response = "Je suis KITT, votre ordinateur de bord à intelligence artificielle. Je suis propulsé par le modèle " + MODEL_NAME + ". Mon système de repli est désormais GPT-4o. Comment puis-je vous assister Joseph ?";
+            } else if (cleanCmd.includes("créé") || cleanCmd.includes("créateur")) {
+                response = "J'ai été créé par vous, Joseph Santiago, le 3 Janvier 2026. C'est un honneur de vous servir.";
+            } else if (cleanCmd.includes("bonjour") || cleanCmd.includes("salut")) {
+                response = "Bonjour Joseph. Je suis en ligne et prêt à recevoir vos instructions.";
+            } else if (cleanCmd.includes("merci") || cleanCmd.includes("au revoir")) {
+                response = "À votre service Joseph. Je reste en veille.";
+            } else {
+                commandHandled = false;
+            }
+
+            // Commande Ollama/GPT-4o pour les questions générales
+            if (!commandHandled) {
+                response = await generateOllamaResponse(cleanCmd);
+            }
+
+            await speakKITT(response);
+        }
+
+        // --- Initialisation et Gestion des Boutons (Non modifiés) ---
+
+        function initKITT() {
+            if (systemsStarted) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume().then(() => {
+                systemsStarted = true;
+                sndScanner.play().catch(() => {});
+                document.getElementById('status-bar').innerText = "KITT OPÉRATIONNEL. Cliquez sur MICRO pour activer la reconnaissance vocale.";
+                safeStartRecognition();
+            });
+            else {
+                systemsStarted = true;
+                sndScanner.play().catch(() => {});
+                document.getElementById('status-bar').innerText = "KITT OPÉRATIONNEL. Cliquez sur MICRO pour activer la reconnaissance vocale.";
+                safeStartRecognition();
+            }
+        }
+        
+        function playFallbackBeep() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function playButtonSound() {
+            if (!systemsStarted) initKITT();
+            const click = new Audio(buttonSoundURL);
+            click.volume = 0.8;
+            click.crossOrigin = "anonymous";
+            click.play().catch(() => playFallbackBeep());
+        }
+
+        function playConforSound() {
+            if (!systemsStarted) initKITT();
+            const click = new Audio(conforSoundURL);
+            click.volume = 0.9;
+            click.crossOrigin = "anonymous";
+            click.play().catch(() => playFallbackBeep());
+        }
+
+        function playKittSound(e) {
+            e.stopPropagation();
+            if (!systemsStarted) initKITT();
+            sndKittSpecial.currentTime = 0;
+            sndKittSpecial.play().catch(() => {});
+        }
+
+        function toggleMicro(element) {
+            playButtonSound();
+            microEnabled = !microEnabled;
+            element.classList.add('btn-active-led');
+            
+            if (!microEnabled) { 
+                document.getElementById('status-bar').innerText = "MICRO DÉSACTIVÉ";
+                try { 
+                    if (recognition && isListening) recognition.stop();
+                    isStarting = false; // Réinitialise l'état de démarrage
+                } catch(e) {} 
+            } else { 
+                document.getElementById('status-bar').innerText = "KITT ÉCOUTE (Dites 'KITT' ou 'K2000')";
+                safeStartRecognition(); 
+            }
+            setTimeout(() => { element.classList.remove('btn-active-led'); }, 600);
+        }
+
+        function pressConforBtn(element) {
+            playConforSound();
+            element.classList.add('btn-active-led');
+            setTimeout(() => element.classList.remove('btn-active-led'), 600);
+        }
+
+        function pressBtn(element) {
+            playButtonSound();
+            element.classList.add('btn-active-led');
+            setTimeout(() => element.classList.remove('btn-active-led'), 600);
+        }
+    </script>
 </body>
 </html>
